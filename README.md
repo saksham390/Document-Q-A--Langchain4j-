@@ -151,7 +151,7 @@ The PDFBox parser used here preserves document metadata, including any page meta
 
 An entire PDF is usually too large and too broad to send to an LLM for every question. Chunking creates smaller searchable units, so Pinecone can return only the passages likely to answer the question. This project uses 800-character chunks with 120 characters of overlap. The overlap repeats a small boundary between neighboring chunks so a definition or sentence split at a boundary remains retrievable. Chunk size and overlap are practical starting points, not universal rules.
 
-## Simple RAG concepts
+##  RAG
 
 - **RAG:** Retrieve relevant private or current text and place it in an LLM prompt before generating an answer.
 - **Embedding:** A vector of numbers representing the meaning of text. Similar meanings tend to have nearby vectors.
@@ -168,6 +168,6 @@ An entire PDF is usually too large and too broad to send to an LLM for every que
 
 Invalid or empty uploads and empty questions return `400`. Parsing, embedding, Pinecone, and LLM failures are translated into a clear `502` response by `GlobalExceptionHandler`. Unexpected failures return `500`.
 
-## 60-90 second interview explanation
+## Explanation
 
 I built a Simple RAG document question-answering service with Spring Boot, Java 17, LangChain4j, OpenAI, and Pinecone. A user uploads a PDF through a multipart endpoint. The application parses it with Apache PDFBox, adds filename metadata, splits the text into 800-character chunks with 120 characters of overlap, embeds each chunk with OpenAI `text-embedding-3-small`, and stores the vectors and text in a Pinecone cosine index with 1536 dimensions. When a question arrives, I embed the question, run a top-4 similarity search, combine those chunks into context, and send that context plus a strict question-answering prompt to `gpt-4o-mini`. The response includes both the answer and source metadata. I kept the design intentionally simple: no query rewriting, hybrid search, reranking, agents, or memory. This reduces hallucination by making the model answer only from retrieved document context, while allowing the source document to change without retraining the model.
